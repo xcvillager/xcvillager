@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>xcvillager.com</title>
+    <meta name="description" content="xcvillager, xcvillager.com, xc villager, xcvillager merch, xc villager мерч" />
+    <meta name="keywords" content="xcvillager, xcvillager.com, xc villager, xcvillager merch, xc villager мерч" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="canonical" href="https://xcvillager.com/" />
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "xcvillager",
+      "alternateName": ["xcvillager.com", "xcvillager", "xc villager"],
+      "url": "https://xcvillager.com/"
+    }
+    </script>
+
+    <style>
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+        }
+
+        .bg-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-color: black;
+            transition: opacity 1s ease-in-out;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            box-sizing: border-box;
+            background-color: black;
+        }
+
+        .doors-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .doors-row a {
+            display: flex;
+            flex: 0 1 auto;
+        }
+
+        .doors-row img {
+            max-width: 30vw;
+            max-height: 45vh;
+            object-fit: contain;
+        }
+
+        .budka {
+            display: flex;
+            padding: 0;
+            background: transparent;
+        }
+
+        .budka img {
+            width: 80px;
+            height: auto;
+            display: block;
+        }
+
+        .center-link {
+            display: block;
+            width: 300px;
+            height: 300px;
+        }
+
+        .center-link img {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+    <div id="bg1" class="bg-layer" style="opacity: 1;"></div>
+    <div id="bg2" class="bg-layer" style="opacity: 0;"></div>
+
+    <div class="budka">
+        <a href="https://t.me/xcvillagerhvh" target="_blank" rel="noopener noreferrer">
+            <img src="image/budka.png" alt="" draggable="false" loading="eager" decoding="async" fetchpriority="high">
+        </a>
+    </div>
+
+    <div class="doors-row">
+        <a href="image/1005(1).mp4">
+            <img src="image/door_1.png" alt="" draggable="false" loading="eager" decoding="async" fetchpriority="high">
+        </a>
+        <a href="image/1005(4).mp4">
+            <img src="image/door_2.png" alt="" draggable="false" loading="eager" decoding="async" fetchpriority="high">
+        </a>
+    </div>
+
+    <a href="https://funpay.com/users/7768199/" target="_blank" rel="noopener noreferrer" class="center-link">
+        <img src="image/tshirt.png" alt="" draggable="false" loading="eager" decoding="async" fetchpriority="high">
+    </a>
+
+    <audio id="bg-track" src="image/song.mp3" autoplay loop playsinline style="display: none;"></audio>
+
+    <script>
+        (function() {
+            const IMAGE_FOLDER = "img/";
+            const INTERVAL_MS = 2000;
+
+            const imageFilenames = [];
+            for (let i = 1; i <= 45; i++) {
+                imageFilenames.push(`photo_${i}_2026-10-05_19-10-20.jpg`);
+            }
+
+            function shuffleArray(arr) {
+                const a = [...arr];
+                for (let i = a.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+                return a;
+            }
+
+            const layer1 = document.getElementById('bg1');
+            const layer2 = document.getElementById('bg2');
+            const layers = [layer1, layer2];
+
+            if (!layer1 || !layer2) return;
+
+            function preloadImage(filename) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    if ('fetchPriority' in img) {
+                        img.fetchPriority = 'low';
+                    }
+                    img.decoding = 'async';
+                    const url = IMAGE_FOLDER + filename;
+                    img.onload = () => resolve(url);
+                    img.onerror = () => resolve(null);
+                    img.src = url;
+                });
+            }
+
+            let shuffled = [];
+            let activeLayer = 0;
+            let currentImageIndex = 0;
+            let ready = false;
+            let lastChangeTime = performance.now();
+            let rafId = null;
+
+            function switchToImage(newIndex) {
+                if (newIndex === currentImageIndex) return;
+                const nextLayer = 1 - activeLayer;
+                layers[nextLayer].style.backgroundImage = `url('${shuffled[newIndex]}')`;
+                layers[activeLayer].style.opacity = '0';
+                layers[nextLayer].style.opacity = '1';
+                activeLayer = nextLayer;
+                currentImageIndex = newIndex;
+            }
+
+            function updateBackground(now) {
+                if (!ready) {
+                    rafId = requestAnimationFrame(updateBackground);
+                    return;
+                }
+                if (now - lastChangeTime >= INTERVAL_MS) {
+                    const steps = Math.floor((now - lastChangeTime) / INTERVAL_MS);
+                    let newIndex = currentImageIndex + steps;
+
+                    while (newIndex >= shuffled.length) {
+                        shuffled = shuffleArray(shuffled);
+                        newIndex -= shuffled.length;
+                        currentImageIndex = -1;
+                    }
+
+                    if (newIndex !== currentImageIndex) {
+                        switchToImage(newIndex);
+                    }
+                    lastChangeTime = now;
+                }
+                rafId = requestAnimationFrame(updateBackground);
+            }
+
+            function startAnimation() {
+                if (rafId) cancelAnimationFrame(rafId);
+                lastChangeTime = performance.now();
+                rafId = requestAnimationFrame(updateBackground);
+            }
+
+            function addImageToRotation(url) {
+                shuffled.push(url);
+                if (!ready) {
+                    layers[activeLayer].style.backgroundImage = `url('${url}')`;
+                    layers[activeLayer].style.opacity = '1';
+                    layers[1 - activeLayer].style.opacity = '0';
+                    currentImageIndex = shuffled.length - 1;
+                    ready = true;
+                    startAnimation();
+                }
+            }
+
+            imageFilenames.forEach(filename => {
+                preloadImage(filename).then(url => {
+                    if (url) addImageToRotation(url);
+                });
+            });
+
+            const audio = document.getElementById('bg-track');
+            if (audio) {
+                audio.play().catch(() => {
+                    const playOnInteraction = () => {
+                        audio.play().catch(() => {});
+                        document.removeEventListener('click', playOnInteraction);
+                        document.removeEventListener('touchstart', playOnInteraction);
+                        document.removeEventListener('keydown', playOnInteraction);
+                    };
+                    document.addEventListener('click', playOnInteraction);
+                    document.addEventListener('touchstart', playOnInteraction);
+                    document.addEventListener('keydown', playOnInteraction);
+                });
+
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden && audio.paused) {
+                        audio.play().catch(() => {});
+                    }
+                });
+            }
+
+        })();
+    </script>
+</body>
+</html>
